@@ -1,3 +1,6 @@
+# Code for ETL operations on Country-GDP data
+# Importing the required libraries
+
 import requests
 import pandas as pd 
 import sqlite3
@@ -6,15 +9,12 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 
-
-# Code for ETL operations on Country-GDP data
 url = 'https://web.archive.org/web/20230902185326/https://en.wikipedia.org/wiki/List_of_countries_by_GDP_%28nominal%29'
 table_attribs = ["Country", "GDP_USD_millions"]
 db_name ='World_Economies.db'
 table_name = 'Countries_by_GDP'
 csv_path = './Countries_by_GDP.csv'
 
-# Importing the required libraries
 
 def extract(url, table_attribs):
     html_page = requests.get(url).text
@@ -31,7 +31,7 @@ def extract(url, table_attribs):
             country = col[0].get_text(strip=True)
             gdp = col[2].get_text(strip=True)
 
-            # ⛔️ Přeskočit prázdné nebo nečíselné řádky
+            # Přeskočit prázdné nebo nečíselné řádky
             try:
                 float(gdp.replace(',', ''))
             except ValueError:
