@@ -67,6 +67,8 @@ def transform(df, csv_path):
     df["MC_EUR_Billion"]=""
     df["MC_INR_Billion"]=""
 
+    df["MC_GBP_Billion"] = [np.round(x*rates['GBP'],2) for x in df['MC_USD_Billion']]
+
     return df
 
 
