@@ -54,6 +54,19 @@ def transform(df, csv_path):
     information, and adds three columns to the data frame, each
     containing the transformed version of Market Cap column to
     respective currencies'''
+
+    rates = {}
+
+    with open(csv_path, "r") as file:
+        for line in file:
+            currency, rate = line.strip().split(',')
+            rates[currency] = float(rate)
+
+    df = pd.DataFrame(rows, columns=["Currency", "Rate"])
+    df["MC_GBP_Billion"]=""
+    df["MC_EUR_Billion"]=""
+    df["MC_INR_Billion"]=""
+
     return df
 
 
