@@ -10,6 +10,7 @@ table_attribs = ["Name", "MC_USD_Billion"]
 db_name =  "Banks.db"
 table_name = "Largest_banks"
 csv_path = "./Largest_banks_data.csv"
+file_path = "./exchange_rate.csv"
 
 def log_progress(message):
     ''' This function logs the mentioned message of a given stage of the
@@ -49,7 +50,7 @@ def extract(url, table_attribs):
 
     return df
 
-def transform(df, csv_path):
+def transform(df, file_path):
     ''' This function accesses the CSV file for exchange rate
     information, and adds three columns to the data frame, each
     containing the transformed version of Market Cap column to
@@ -57,22 +58,24 @@ def transform(df, csv_path):
 
     rates = {}
 
-    with open(csv_path, "r") as file:
+    with open(file_path, "r") as file:
+        next(file)  # Přeskočí hlavičku
         for line in file:
             currency, rate = line.strip().split(',')
             rates[currency] = float(rate)
 
-    df = pd.DataFrame(rows, columns=["Currency", "Rate"])
-    df["MC_GBP_Billion"]=""
-    df["MC_EUR_Billion"]=""
-    df["MC_INR_Billion"]=""
+    df["MC_USD_Billion"] = df["MC_USD_Billion"].str.replace(',', '').astype(float)
 
-    df["MC_GBP_Billion"] = [np.round(x*rates['GBP'],2) for x in df['MC_USD_Billion']]
+    df["MC_GBP_Billion"] = np.round(df["MC_USD_Billion"] * rates["GBP"], 2)
+    df["MC_EUR_Billion"] = np.round(df["MC_USD_Billion"] * rates["EUR"], 2)
+    df["MC_INR_Billion"] = np.round(df["MC_USD_Billion"] * rates["INR"], 2)
 
+    print(df)
     return df
 
-
-log_progress('Preliminaries complete. Initiating ETL process')
-
 df = extract(url, table_attribs)
+log_progress("Data extraction complete")
 
+df = transform(df, file_path)
+print(df['MC_EUR_Billion'][4])
+log_progress("Currency conversion complete")
